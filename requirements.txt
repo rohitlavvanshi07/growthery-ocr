@@ -5,3 +5,4 @@ pillow
 opencv-python
 python-multipart
 PyPDF2
+PyMuPDF
