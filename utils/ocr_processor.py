@@ -1,8 +1,11 @@
 import pytesseract
 from PIL import Image
 import io
+import fitz  # PyMuPDF
 
-def extract_text_from_image(image_bytes: bytes) -> str:
-    image = Image.open(io.BytesIO(image_bytes))
-    text = pytesseract.image_to_string(image)
+def extract_text_from_pdf(pdf_bytes: bytes) -> str:
+    text = ""
+    with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
+        for page in doc:
+            text += page.get_text()
     return text
