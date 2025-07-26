@@ -1,18 +1,21 @@
-from fastapi import FastAPI, UploadFile, File
-from PyPDF2 import PdfReader
-import io
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from routes.ocr import router as ocr_router
 
 app = FastAPI()
 
-@app.post("/extract-pdf-buffer")
-async def extract_pdf_buffer(file: UploadFile = File(...)):
-    contents = await file.read()
-    reader = PdfReader(io.BytesIO(contents))
-    text = ""
+# CORS setup (safe to allow all for dev)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    for page in reader.pages:
-        page_text = page.extract_text()
-        if page_text:
-            text += page_text + "\n"
-    
-    return {"text": text.strip()}
+@app.get("/")
+async def root():
+    return {"message": "OCR service is live!"}
+
+# Mount the OCR router
+app.include_router(ocr_router, prefix="/ocr")
